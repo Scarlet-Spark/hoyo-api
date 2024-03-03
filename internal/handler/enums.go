@@ -1,10 +1,10 @@
 package handler
 
 // Language codes for localization on HoYoLab endpoints.
-type LanguageEnum string
+type Language string
 
 // Salts for generating dynamic secrets.
-type DsSaltEnum string
+type DynamicSecretSalt string
 
 // Request methods.
 type RequestMethod string
@@ -14,25 +14,25 @@ type ContentEncoding string
 
 const (
 	// Languages.
-	SIMPLIFIED_CHINESE LanguageEnum = "zh-cn"
-	TRADIIONAL_CHINESE LanguageEnum = "zh-tw"
-	GERMAN             LanguageEnum = "de-de"
-	ENGLISH            LanguageEnum = "en-us"
-	SPANISH            LanguageEnum = "es-es"
-	FRENCH             LanguageEnum = "fr-fr"
-	INDONESIAN         LanguageEnum = "id-id"
-	ITALIAN            LanguageEnum = "it-it"
-	JAPANESE           LanguageEnum = "ja-jp"
-	KOREAN             LanguageEnum = "ko-kr"
-	PORTUGUESE         LanguageEnum = "pt-pt"
-	RUSSIAN            LanguageEnum = "ru-ru"
-	THAI               LanguageEnum = "th-th"
-	TURKISH            LanguageEnum = "tr-tr"
-	VIETNAMESE         LanguageEnum = "vi-vn"
+	SIMPLIFIED_CHINESE Language = "zh-cn"
+	TRADIIONAL_CHINESE Language = "zh-tw"
+	GERMAN             Language = "de-de"
+	ENGLISH            Language = "en-us"
+	SPANISH            Language = "es-es"
+	FRENCH             Language = "fr-fr"
+	INDONESIAN         Language = "id-id"
+	ITALIAN            Language = "it-it"
+	JAPANESE           Language = "ja-jp"
+	KOREAN             Language = "ko-kr"
+	PORTUGUESE         Language = "pt-pt"
+	RUSSIAN            Language = "ru-ru"
+	THAI               Language = "th-th"
+	TURKISH            Language = "tr-tr"
+	VIETNAMESE         Language = "vi-vn"
 
 	// Dynamic secret salts.
-	GLOBAL    DsSaltEnum = "6s25p5ox5y14umn1p61aqyyvbvvl3lrt"
-	APP_LOGIN DsSaltEnum = "IZPgfb0dRPtBeLuFkdDznSZ6f4wWt6y2"
+	GLOBAL    DynamicSecretSalt = "6s25p5ox5y14umn1p61aqyyvbvvl3lrt"
+	APP_LOGIN DynamicSecretSalt = "IZPgfb0dRPtBeLuFkdDznSZ6f4wWt6y2"
 
 	// Request methods.
 	GET  RequestMethod = "GET"
@@ -43,3 +43,23 @@ const (
 	DEFLATE ContentEncoding = "deflate"
 	BR      ContentEncoding = "br"
 )
+
+// Language stringer.
+func (language Language) String() string {
+	return string(language)
+}
+
+// Dynamic secret salt stringer.
+func (salt DynamicSecretSalt) String() string {
+	return string(salt)
+}
+
+// Request method stringer.
+func (method RequestMethod) String() string {
+	return string(method)
+}
+
+// Content encoding stringer.
+func (encoding ContentEncoding) String() string {
+	return string(encoding)
+}

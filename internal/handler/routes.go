@@ -21,6 +21,11 @@ const (
 	GENSHIN_DAILY_CHECK_IN_CLAIM_API Endpoint = HK4E_API + "/event/" + GENSHIN_DAILY_CHECK_IN_EVENT_ID + "/sign?act_id=" + GENSHIN_DAILY_CHECK_IN_ACT_ID
 
 	// HoYoWiki API endpoints.
-	HOYOWIKI_ENTRY_LIST_API Endpoint = WIKI_API + "/hoyowiki/wapi/get_entry_page_list"
-	HOYOWIKI_ENTRY_API      Endpoint = WIKI_API + "hoyowiki/wapi/entry_page"
+	HOYOWIKI_ENTRY_PAGE_LIST_API Endpoint = WIKI_API + "/hoyowiki/wapi/get_entry_page_list"
+	HOYOWIKI_ENTRY_PAGE_API      Endpoint = WIKI_API + "/hoyowiki/wapi/entry_page"
 )
+
+// Endpoint stringer.
+func (endpoint Endpoint) String() string {
+	return string(endpoint)
+}

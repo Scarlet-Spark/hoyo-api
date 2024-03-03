@@ -15,7 +15,7 @@ import (
 type Request struct {
 	endpoint Endpoint
 	method   RequestMethod
-	body     interface{}
+	body     map[string]interface{}
 	params   map[string]string
 	headers  map[string]string
 }
@@ -25,7 +25,7 @@ func NewRequest(endpoint Endpoint, method RequestMethod) *Request {
 	request := &Request{
 		endpoint: endpoint,
 		method:   method,
-		body:     nil,
+		body:     make(map[string]interface{}),
 		params:   make(map[string]string),
 		headers:  make(map[string]string),
 	}
@@ -36,18 +36,18 @@ func NewRequest(endpoint Endpoint, method RequestMethod) *Request {
 }
 
 // Set body.
-func (request *Request) SetBody(body interface{}) {
-	request.body = body
-}
-
-// Set query parameters.
-func (request *Request) SetParams(params map[string]string) {
-	request.params = params
+func (request *Request) SetBody(key string, value interface{}) {
+	request.body[key] = value
 }
 
 // Set query parameter.
 func (request *Request) SetParam(key string, value string) {
 	request.params[key] = value
+}
+
+// Set header.
+func (request *Request) SetHeader(key string, value string) {
+	request.headers[key] = value
 }
 
 // Set cookie to request header.
@@ -56,12 +56,12 @@ func (request *Request) SetCookie(cookie *middleware.Cookie) {
 }
 
 // Set language to request header.
-func (request *Request) SetLanguage(language LanguageEnum) {
+func (request *Request) SetLanguage(language Language) {
 	request.headers["X-Rpc-Language"] = string(language)
 }
 
 // Set dynamic secret to request header.
-func (request *Request) SetDynamicSecret(salt DsSaltEnum) {
+func (request *Request) SetDynamicSecret(salt DynamicSecretSalt) {
 	// Generate random 6-letter string.
 	length := 6
 	charset := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
