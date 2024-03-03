@@ -1,0 +1,15 @@
+package errors
+
+// Custom error codes for HTTP request handler.
+type ErrorCode string
+
+const (
+	// Internal Go error codes.
+	JSON_SERIALIZATION_ERROR   ErrorCode = "JSON_SERIALIZATION_ERROR"
+	JSON_DESERIALIZATION_ERROR ErrorCode = "JSON_DESERIALIZATION_ERROR"
+	URL_PARSING_ERROR          ErrorCode = "URL_PARSING_ERROR"
+	REQUEST_CREATION_ERROR     ErrorCode = "REQUEST_CREATION_ERROR"
+	API_REQUEST_SEND_ERROR     ErrorCode = "API_REQUEST_SEND_ERROR"
+	API_RESPONSE_STATUS_ERROR  ErrorCode = "API_RESPONSE_STATUS_ERROR"
+	RESPONSE_READ_ERROR        ErrorCode = "RESPONSE_READ_ERROR"
+)
