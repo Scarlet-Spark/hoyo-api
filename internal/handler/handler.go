@@ -15,83 +15,93 @@ import (
 )
 
 // Default HTTP client timeout duration.
-const CLIENT_DEFAULT_TIMEOUT = 10 * time.Second
+const clientDefaultTimeout = 10 * time.Second
 
-// Base HTTP request handler for sending requests to HoYoLab endpoints.
+// Base HTTP request handler for sending requests to HoYoLab endpoints and parsing responses.
 type Handler struct {
-	client http.Client
-	cache  middleware.Cache
+	Client http.Client
+	middleware.Cookie
 }
 
-// Creates a new HTTP request handler instance.
-func NewHandler() *Handler {
-	handler := &Handler{http.Client{Timeout: CLIENT_DEFAULT_TIMEOUT}, *middleware.NewCache()}
+// Constructor.
+func NewHandler(cookie middleware.Cookie) Handler {
+	client := http.DefaultClient
+	client.Timeout = clientDefaultTimeout
+	client.Transport = &http.Transport{
+		MaxIdleConns:        10,
+		MaxIdleConnsPerHost: 2,
+	}
+
+	handler := Handler{Client: *client, Cookie: cookie}
 	return handler
 }
 
 // Sends a HTTP request.
 // Returns a generic map from the unmarshalled response.
 // Specific retcode errors are handled by their respective clients.
-func (handler *Handler) Send(request *Request) (data map[string]interface{}, clientError errors.HandlerError) {
+func (handler Handler) Send(request Request) (map[string]interface{}, error) {
 	// Build HTTP request.
-	httpRequest, clientError := handler.createHttpRequest(request)
+	httpRequest, err := handler.createHttpRequest(request)
+	if err != nil {
+		return nil, err
+	}
 
-	if clientError.Exists {
-		return
+	// Add cookies.
+	for _, cookie := range handler.GetCookies() {
+		httpRequest.AddCookie(&cookie)
 	}
 
 	// Send HTTP request.
-	response, err := handler.client.Do(httpRequest)
+	response, err := handler.Client.Do(httpRequest)
 	if err != nil {
 		return nil,
-			errors.NewHandlerError(
-				errors.HTTP_REQUEST_SEND_ERROR.String(),
-				fmt.Sprintf("URL: %s, Error: %s", request.endpoint, err.Error()),
+			errors.NewError(
+				errors.HTTP_REQUEST_SEND_ERROR,
+				fmt.Sprintf("URL: %s\nError: %s", request.endpoint, err.Error()),
 			)
 	}
 
 	defer response.Body.Close()
 
 	// Parse response body into readable format.
-	body, clientError := handler.parseResponse(response)
-	if clientError.Exists {
-		return nil, clientError
+	body, err := handler.parseResponse(response)
+	if err != nil {
+		return nil, err
 	}
 
 	if response.StatusCode != http.StatusOK {
 		return nil,
-			errors.NewHandlerError(
-				response.Status,
-				fmt.Sprintf("URL: %s, Status Code: %d, Error: %+v", request.endpoint, response.StatusCode, string(body)),
+			errors.NewError(
+				response.StatusCode,
+				fmt.Sprintf("URL: %s\nError: %+v", request.endpoint, string(body)),
 			)
 	}
 
 	// Return JSON marshalled response.
-	err = json.Unmarshal(body, &data)
-	if err != nil {
+	data := make(map[string]interface{})
+	if err = json.Unmarshal(body, &data); err != nil {
 		return nil,
-			errors.NewHandlerError(
-				errors.JSON_DESERIALIZATION_ERROR.String(),
-				fmt.Sprintf("Body: %s, Error: %s", body, err.Error()),
+			errors.NewError(
+				errors.JSON_DESERIALIZATION_ERROR,
+				fmt.Sprintf("Error: %s", err.Error()),
 			)
 	}
 
-	return data, clientError
+	return data, nil
 }
 
 // Create HTTP request structure.
-func (handler *Handler) createHttpRequest(request *Request) (httpRequest *http.Request, clientError errors.HandlerError) {
+func (handler Handler) createHttpRequest(request Request) (*http.Request, error) {
 	var body io.Reader
 
 	// JSON marshal request body.
 	if request.body != nil {
 		jsonData, err := json.Marshal(request.body)
-
 		if err != nil {
 			return nil,
-				errors.NewHandlerError(
-					errors.JSON_SERIALIZATION_ERROR.String(),
-					fmt.Sprintf("Request Body: %+v, Error: %s", request.body, err.Error()),
+				errors.NewError(
+					errors.JSON_SERIALIZATION_ERROR,
+					fmt.Sprintf("Error: %s", err.Error()),
 				)
 		}
 
@@ -99,13 +109,12 @@ func (handler *Handler) createHttpRequest(request *Request) (httpRequest *http.R
 	}
 
 	// Create HTTP request.
-	httpRequest, err := http.NewRequest(string(request.method), string(request.endpoint), body)
-
+	httpRequest, err := http.NewRequest(request.method, request.endpoint, body)
 	if err != nil {
 		return nil,
-			errors.NewHandlerError(
-				errors.HTTP_REQUEST_CREATE_ERROR.String(),
-				fmt.Sprintf("URL: %s, Error: %s", request.endpoint, err.Error()),
+			errors.NewError(
+				errors.HTTP_REQUEST_CREATE_ERROR,
+				fmt.Sprintf("URL: %s\nError: %s", request.endpoint, err.Error()),
 			)
 	}
 
@@ -122,43 +131,43 @@ func (handler *Handler) createHttpRequest(request *Request) (httpRequest *http.R
 		httpRequest.Header.Set(k, v)
 	}
 
-	return httpRequest, clientError
+	return httpRequest, nil
 }
 
 // Parse response body by decompressing content according to its encoding.
 // HoYoLab endpoints currently support gzip, deflate and brotli.
-func (handler *Handler) parseResponse(response *http.Response) (body []byte, clientError errors.HandlerError) {
+func (handler Handler) parseResponse(response *http.Response) ([]byte, error) {
 	var err error
 	var reader io.ReadCloser
 
 	switch encoding := response.Header.Get("Content-Encoding"); encoding {
-	case string(GZIP):
+	case encodingGzip:
 		reader, err = gzip.NewReader(response.Body)
 		if err != nil {
 			return nil,
-				errors.NewHandlerError(
-					errors.HTTP_RESPONSE_READ_ERROR.String(),
-					fmt.Sprintf("Body: %+v, Error: %s", response.Body, err.Error()),
+				errors.NewError(
+					errors.HTTP_RESPONSE_READ_ERROR,
+					fmt.Sprintf("Error: %s", err.Error()),
 				)
 		}
 
-	case string(DEFLATE):
+	case encodingDeflate:
 		reader = flate.NewReader(response.Body)
 
 	default:
 		reader = response.Body
 	}
 
-	body, err = io.ReadAll(reader)
-	reader.Close()
+	defer reader.Close()
 
+	body, err := io.ReadAll(reader)
 	if err != nil {
 		return nil,
-			errors.NewHandlerError(
-				errors.HTTP_RESPONSE_READ_ERROR.String(),
-				fmt.Sprintf("Body: %+v, Error: %s", response.Body, err.Error()),
+			errors.NewError(
+				errors.HTTP_RESPONSE_READ_ERROR,
+				fmt.Sprintf("Error: %s", err.Error()),
 			)
 	}
 
-	return body, clientError
+	return body, nil
 }

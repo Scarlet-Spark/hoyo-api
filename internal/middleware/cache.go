@@ -11,7 +11,7 @@ type Cache struct {
 	mutex sync.Mutex
 }
 
-// Creates a new cache instance.
+// Constructor.
 func NewCache() *Cache {
 	cache := &Cache{items: make(map[string]cacheItem)}
 	return cache
@@ -38,11 +38,7 @@ func (c *Cache) Get(k string) any {
 func (c *Cache) Set(k string, v any, d time.Duration) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
-
-	c.items[k] = cacheItem{
-		data: v,
-		ttl:  time.Now().Add(d),
-	}
+	c.items[k] = newCacheItem(v, time.Now().Add(d))
 }
 
 // Removes item from the cache.
