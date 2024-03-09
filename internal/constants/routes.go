@@ -16,23 +16,10 @@ const (
 	// HoYoWiki API endpoints.
 	HOYOWIKI_ENTRY_PAGE_LIST_API = WIKI_API + "/hoyowiki/wapi/get_entry_page_list"
 	HOYOWIKI_ENTRY_PAGE_API      = WIKI_API + "/hoyowiki/wapi/entry_page"
-
-	// Daily Rewards parameters.
-	GENSHIN_DAILY_CHECK_IN_EVENT_ID = "sol"
-	GENSHIN_DAILY_CHECK_IN_ACT_ID   = "e202102251931481"
 )
 
-// Returns the endpoint for daily reward list.
-func DailyRewardListAPI(baseUrl string, eventId string, actId string) string {
-	return fmt.Sprintf("%s/event/%s/home?act_id=%s", baseUrl, eventId, actId)
-}
-
-// Returns the endpoint for daily reward info.
-func DailyRewardInfoAPI(baseUrl string, eventId string, actId string) string {
-	return fmt.Sprintf("%s/event/%s/info?act_id=%s", baseUrl, eventId, actId)
-}
-
-// Returns the endpoint for daily reward claim.
-func DailyRewardClaimAPI(baseUrl string, eventId string, actId string) string {
-	return fmt.Sprintf("%s/event/%s/sign?act_id=%s", baseUrl, eventId, actId)
+// Returns the endpoint for daily rewards.
+func DailyRewardAPI(game Game, daily DailyRewardParam) string {
+	params := gameEndpointParams[game]
+	return fmt.Sprintf("%s/event/%s/%s?act_id=%s", params.baseUrl, params.eventId, string(daily), params.actId)
 }

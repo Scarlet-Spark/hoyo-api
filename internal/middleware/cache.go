@@ -7,14 +7,23 @@ import (
 
 // Simple in-memory Cache with TTL (Time to Live) support.
 type Cache struct {
-	items map[string]cacheItem
-	mutex sync.Mutex
+	items      map[string]cacheItem
+	defaultTTL time.Duration
+	mutex      sync.Mutex
 }
 
 // Constructor.
 func NewCache() *Cache {
-	cache := &Cache{items: make(map[string]cacheItem)}
+	cache := &Cache{
+		items:      make(map[string]cacheItem),
+		defaultTTL: time.Minute,
+	}
 	return cache
+}
+
+// Set the default TTL of the cache.
+func (c *Cache) SetCacheDuration(d time.Duration) {
+	c.defaultTTL = d
 }
 
 // Get an item from the cache.
@@ -33,9 +42,15 @@ func (c *Cache) Get(k string) any {
 	return nil
 }
 
-// Adds an item to the cache with its TTL.
+// Adds an item to the cache using the default TTL.
 // Replaces existing item if the key exists.
-func (c *Cache) Set(k string, v any, d time.Duration) {
+func (c *Cache) Set(k string, v any) {
+	c.SetWithTTL(k, v, c.defaultTTL)
+}
+
+// Adds an item to the cache with a custom TTL.
+// Replaces existing item if the key exists.
+func (c *Cache) SetWithTTL(k string, v any, d time.Duration) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 	c.items[k] = newCacheItem(v, time.Now().Add(d))
