@@ -6,6 +6,15 @@ type Game string
 // Daily reward endpoint parameter.
 type DailyRewardParam string
 
+// Language codes supported in HoYoLab.
+type Language string
+
+// Genshin regional server codes.
+type GenshinRegion string
+
+// Dynamic secret salts used in HoYoLab.
+type DynamicSecret string
+
 const (
 	// Game types.
 	GAME_GENSHIN   Game = "GENSHIN"
@@ -16,34 +25,42 @@ const (
 	DAILY_REWARD_INFO DailyRewardParam = "info"
 	DAILY_REWARD_SIGN DailyRewardParam = "sign"
 
-	// Genshin endpoint parameters.
-	GENSHIN_EVENT_ID = "sol"
-	GENSHIN_ACT_ID   = "e202102251931481"
-
-	// Star Rail endpoint parameters.
-	STAR_RAIL_EVENT_ID = "luna/os"
-	STAR_RAIL_ACT_ID   = "e202303301540311"
-
 	// Languages.
-	LANG_SIMPLIFIED_CHINESE = "zh-cn"
-	LANG_TRADIIONAL_CHINESE = "zh-tw"
-	LANG_GERMAN             = "de-de"
-	LANG_ENGLISH            = "en-us"
-	LANG_SPANISH            = "es-es"
-	LANG_FRENCH             = "fr-fr"
-	LANG_INDONESIAN         = "id-id"
-	LANG_ITALIAN            = "it-it"
-	LANG_JAPANESE           = "ja-jp"
-	LANG_KOREAN             = "ko-kr"
-	LANG_PORTUGUESE         = "pt-pt"
-	LANG_RUSSIAN            = "ru-ru"
-	LANG_THAI               = "th-th"
-	LANG_TURKISH            = "tr-tr"
-	LANG_VIETNAMESE         = "vi-vn"
+	LANG_SIMPLIFIED_CHINESE Language = "zh-cn"
+	LANG_TRADIIONAL_CHINESE Language = "zh-tw"
+	LANG_GERMAN             Language = "de-de"
+	LANG_ENGLISH            Language = "en-us"
+	LANG_SPANISH            Language = "es-es"
+	LANG_FRENCH             Language = "fr-fr"
+	LANG_INDONESIAN         Language = "id-id"
+	LANG_ITALIAN            Language = "it-it"
+	LANG_JAPANESE           Language = "ja-jp"
+	LANG_KOREAN             Language = "ko-kr"
+	LANG_PORTUGUESE         Language = "pt-pt"
+	LANG_RUSSIAN            Language = "ru-ru"
+	LANG_THAI               Language = "th-th"
+	LANG_TURKISH            Language = "tr-tr"
+	LANG_VIETNAMESE         Language = "vi-vn"
+
+	// Genshin regional server codes.
+	GENSHIN_REGION_USA          GenshinRegion = "os_usa"
+	GENSHIN_REGION_EUROPE       GenshinRegion = "os_euro"
+	GENSHIN_REGION_ASIA         GenshinRegion = "os_asia"
+	GENSHIN_REGION_CHINA_TAIWAN GenshinRegion = "os_cht"
 
 	// Dynamic secret salts.
-	DS_GLOBAL    = "6s25p5ox5y14umn1p61aqyyvbvvl3lrt"
-	DS_APP_LOGIN = "IZPgfb0dRPtBeLuFkdDznSZ6f4wWt6y2"
+	DS_GLOBAL    DynamicSecret = "6s25p5ox5y14umn1p61aqyyvbvvl3lrt"
+	DS_APP_LOGIN DynamicSecret = "IZPgfb0dRPtBeLuFkdDznSZ6f4wWt6y2"
+)
+
+const (
+	// Genshin endpoint parameters.
+	genshinEventId = "sol"
+	genshinActId   = "e202102251931481"
+
+	// Star Rail endpoint parameters.
+	starRailEventId = "luna/os"
+	starRailActId   = "e202303301540311"
 )
 
 // Some endpoints are shared across different games with only minor differences to the URL e.g., daily rewards.
@@ -58,12 +75,12 @@ type gameParams struct {
 var gameEndpointParams = map[Game]gameParams{
 	GAME_GENSHIN: {
 		baseUrl: HK4E_API,
-		eventId: GENSHIN_EVENT_ID,
-		actId:   GENSHIN_ACT_ID,
+		eventId: genshinEventId,
+		actId:   genshinActId,
 	},
 	GAME_STAR_RAIL: {
 		baseUrl: PUBLIC_API,
-		eventId: STAR_RAIL_EVENT_ID,
-		actId:   STAR_RAIL_ACT_ID,
+		eventId: starRailEventId,
+		actId:   starRailActId,
 	},
 }

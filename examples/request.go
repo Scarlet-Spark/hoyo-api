@@ -24,7 +24,7 @@ func GetSpiralAbyssInfo(cookie middleware.Cookie) {
 	handler := handler.NewHandler(cookie)
 
 	response, err := handler.Send(request)
-	printResult(response, err, false)
+	printResponse(response, err, false)
 }
 
 // Get Genshin characters list in HoYoWiki.
@@ -41,11 +41,11 @@ func GetGenshinCharacters(cookie middleware.Cookie) {
 	handler := handler.NewHandler(cookie)
 
 	response, err := handler.Send(request)
-	printResult(response, err, false)
+	printResponse(response, err, false)
 }
 
 // Print result.
-func printResult(response map[string]interface{}, err error, ignore bool) {
+func printResponse(response map[string]interface{}, err error, ignore bool) {
 	if err != nil {
 		fmt.Println(err)
 	} else {

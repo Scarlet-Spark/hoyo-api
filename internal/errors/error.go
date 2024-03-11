@@ -23,6 +23,6 @@ func NewError(errorCode int, errorMessage string) error {
 
 // Returns custom error message.
 // Implements from built-in error interface.
-func (handler Error) Error() string {
-	return fmt.Sprintf("%d %s\n%s", handler.ErrorCode, ErrorCodeText(handler.ErrorCode), handler.ErrorMessage)
+func (err Error) Error() string {
+	return fmt.Sprintf("%d %s\n%s", err.ErrorCode, ErrorCodeText(err.ErrorCode), err.ErrorMessage)
 }

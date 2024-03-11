@@ -6,6 +6,7 @@ import (
 )
 
 // Simple in-memory Cache with TTL (Time to Live) support.
+// Intended to be used to store static information e.g., HoYoWiki data.
 type Cache struct {
 	items      map[string]cacheItem
 	defaultTTL time.Duration
@@ -13,6 +14,7 @@ type Cache struct {
 }
 
 // Constructor.
+// Cache has a default TTL of 1 minute.
 func NewCache() *Cache {
 	cache := &Cache{
 		items:      make(map[string]cacheItem),

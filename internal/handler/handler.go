@@ -17,7 +17,8 @@ import (
 // Default HTTP client timeout duration.
 const clientDefaultTimeout = 10 * time.Second
 
-// Base HTTP request handler for sending requests to HoYoLab endpoints and parsing responses.
+// Base handler for dealing with HTTP request processes.
+// This ranges from sending HTTP requests to HoYoLab endpoints, parsing responses, and setting cookies.
 type Handler struct {
 	Client http.Client
 	middleware.Cookie

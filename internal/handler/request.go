@@ -99,12 +99,12 @@ func (builder *RequestBuilder) AddReferer(referer string) *RequestBuilder {
 }
 
 // Add language to request header.
-func (builder *RequestBuilder) AddLanguage(language string) *RequestBuilder {
-	return builder.AddHeader("X-Rpc-Language", language)
+func (builder *RequestBuilder) AddLanguage(language constants.Language) *RequestBuilder {
+	return builder.AddHeader("X-Rpc-Language", string(language))
 }
 
 // Add dynamic secret to request header.
-func (builder *RequestBuilder) AddDynamicSecret(salt string) *RequestBuilder {
+func (builder *RequestBuilder) AddDynamicSecret(salt constants.DynamicSecret) *RequestBuilder {
 	// Generate random 6-letter string.
 	length := 6
 	charset := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -141,6 +141,6 @@ func (builder *RequestBuilder) addDefaultHeaders() *RequestBuilder {
 	builder.AddHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36 Edg/112.0.1722.46")
 	builder.AddHeader("X-Rpc-App_version", "1.5.0")
 	builder.AddHeader("X-Rpc-Client_type", "5")
-	builder.AddHeader("X-Rpc-Language", constants.LANG_ENGLISH)
+	builder.AddHeader("X-Rpc-Language", string(constants.LANG_ENGLISH))
 	return builder
 }
